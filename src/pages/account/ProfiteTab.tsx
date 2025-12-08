@@ -1,7 +1,14 @@
+import type { User } from '@supabase/supabase-js'
 import { Camera, Upload, Save } from 'lucide-react'
 import React from 'react'
 
-export default function ProfileTab() {
+
+type ProfileTabProps={
+  user:User | null
+}
+
+export default function ProfileTab({user}:ProfileTabProps) {
+
   return (
     <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white mb-6">Profile Information</h2>
@@ -17,8 +24,8 @@ export default function ProfileTab() {
                   </button>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold text-lg">Profile Photo</h3>
-                  <p className="text-gray-400 text-sm mb-3">JPG, PNG or GIF. Max size 2MB</p>
+                  <h3 className="text-white font-semibold text-lg mb-1">{user?.user_metadata.full_name}</h3>
+                  {/* <p className="text-gray-400 text-sm mb-3">JPG, PNG or GIF. Max size 2MB</p> */}
                   <div className="flex gap-2">
                     <button className="px-4 py-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg text-white text-sm transition-colors">
                       <Upload size={16} className="inline mr-2" />

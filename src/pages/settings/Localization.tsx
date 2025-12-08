@@ -61,7 +61,7 @@ function Localization(props: LocalizationProps) {
                 {/* Time Zone */}
                 <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Time Zone</label>
-                    <div className="relative">
+                    <div className="relative">  qaaa
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <select className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none text-white appearance-none">
                             <option>Eastern Time (ET)</option>

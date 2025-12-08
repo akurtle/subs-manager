@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function PageThree() {
        const navigate = useNavigate();
         const handleSwitch = () => {
-        navigate('/pageHandler');
+        navigate('/auth');
       };
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white flex flex-col items-center justify-center px-6 py-20">

@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import { Home, Wallet, CalendarDays, BarChart3, User, Settings, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { PageType } from '@/pages/pageHandler/index';
 
-interface SidebarProps {
+export interface SidebarProps {
   onSelect: (page: PageType) => void;
 }
+
+export const handlePageChange = (page: PageType, onSelect: (page: PageType) => void, setIsMobileOpen: (open: boolean) => void) => {
+  onSelect(page);
+  setIsMobileOpen(false);
+};
 
 
 function Sidebar({ onSelect }: SidebarProps) {
@@ -13,10 +18,6 @@ function Sidebar({ onSelect }: SidebarProps) {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
 
-    const handlePageChange = (page: PageType) =>{
-        onSelect(page);
-        setIsMobileOpen(false);
-    }
 
     const menuItems = [
         { label: "Overview", icon: <Home /> },
@@ -76,7 +77,7 @@ function Sidebar({ onSelect }: SidebarProps) {
                     {menuItems.map((item, i) => (
                         <button
                             key={i}
-                            onClick={() => handlePageChange(item.label.toLowerCase() as PageType)}
+                            onClick={() => handlePageChange(item.label.toLowerCase() as PageType,onSelect, setIsMobileOpen)}
                             className={`
                                 w-full flex items-center gap-3 
                                 px-3 py-3 rounded-xl 
