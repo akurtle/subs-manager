@@ -20,6 +20,9 @@ import type { PageType } from '../pageHandler';
 
 import type { Subscription } from './Subscription';
 
+
+import { addSubscription } from '@/client/supabaseFunc';
+
 type errors={
 name:string,
 amount:string | number,
@@ -81,6 +84,7 @@ export default function AddSubscriptionPage({onSelect}:{onSelect: (page:PageType
   };
 
   const validateForm = () => {
+    console.log("here")
     const newErrors:errors = {
         name: '',
         amount: '',
@@ -100,18 +104,24 @@ export default function AddSubscriptionPage({onSelect}:{onSelect: (page:PageType
     }
     
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const hasEmpty = Object.values(newErrors).some(v => v === '');
+
+    console.log(hasEmpty)
+    return hasEmpty;
   };
 
-  const handleSubmit = () => {
+  const  handleSubmit = async () => {
     if (validateForm()) {
       // Here you would typically save to backend/state management
       console.log('Creating subscription:', subscription);
+      await addSubscription(subscription);
       setShowSuccessMessage(true);
       setTimeout(() => {
         setShowSuccessMessage(false);
         // Navigate back to subscriptions page
       }, 2000);
+
+      console.log("Here")
     }
 
 
@@ -132,6 +142,7 @@ export default function AddSubscriptionPage({onSelect}:{onSelect: (page:PageType
       amount: preset.amount
     });
   };
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-900 p-6 lg:p-8">
@@ -444,7 +455,7 @@ export default function AddSubscriptionPage({onSelect}:{onSelect: (page:PageType
         {/* Action Buttons */}
         <div className="flex gap-4">
           <button
-            onClick={handleSubmit}
+            onClick={()=>handleSubmit()}
             className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all font-semibold shadow-lg shadow-blue-500/20"
           >
             <Plus size={20} />

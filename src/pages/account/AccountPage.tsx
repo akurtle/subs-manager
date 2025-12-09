@@ -24,16 +24,17 @@ import SecurityTab from './SecurityTab';
 import BillingTab from './BillingTab';
 import PrefTab from './PrefTab';
 import { useSupabase } from '@/context/useSupabase';
+import { supabase } from '@/client/supabaseClient';
 
 
   type NotificationKey = 'email' | 'push' | 'renewals' | 'reports' | 'marketing';
   export type NotificationsType = Record<NotificationKey, boolean>;
 
-export default function AccountPage() {
+export default async  function AccountPage() {
 
-  const supabase = useSupabase()
+  const db = supabase
 
-  const user = supabase.user
+  const user = (await db.auth.getUser()).data;
 
   const [activeTab, setActiveTab] = useState('profile');
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +73,7 @@ export default function AccountPage() {
         // event.preventDefault();
 
         console.log("Logging out")
-        const { error } = await supabase.supabase.auth.signOut();
+        const { error } = await db.auth.signOut();
         if (error) {
             alert(error.code || error.message);
             
@@ -114,7 +115,7 @@ export default function AccountPage() {
         <div className="bg-gray-800/40 backdrop-blur-lg border border-gray-700 rounded-xl p-6 lg:p-8">
           {/* Profile Tab */}
           {activeTab === 'profile' && (
-            <ProfileTab user={user}/>
+            <ProfileTab user={user.user}/>
           )}
 
           {/* Security Tab */}
