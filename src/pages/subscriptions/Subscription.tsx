@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { 
+import React, { useContext, useEffect, useState } from 'react';
+import {
   Plus,
   Search,
   Filter,
@@ -20,106 +20,10 @@ import { handlePageChange } from '@/components/reusable/sidebar';
 import type { PageType } from '../pageHandler';
 import SubsGrid from './SubsGrid';
 import SearchSubs from './SearchSubs';
-
-// Sample subscription data
-const initialSubscriptions = [
-  { 
-    id: 1, 
-    name: 'Netflix', 
-    amount: 15.99, 
-    billingDate: 15, 
-    category: 'Entertainment',
-    status: 'active',
-    nextBilling: '15 days',
-    color: '#E50914',
-    frequency: 'monthly',
-    paymentMethod: 'Visa •••• 4242'
-  },
-  { 
-    id: 2, 
-    name: 'Spotify', 
-    amount: 9.99, 
-    billingDate: 1, 
-    category: 'Entertainment',
-    status: 'active',
-    nextBilling: '1 day',
-    color: '#1DB954',
-    frequency: 'monthly',
-    paymentMethod: 'Mastercard •••• 8888'
-  },
-  { 
-    id: 3, 
-    name: 'Adobe Creative Cloud', 
-    amount: 54.99, 
-    billingDate: 10, 
-    category: 'Productivity',
-    status: 'active',
-    nextBilling: '10 days',
-    color: '#FF0000',
-    frequency: 'monthly',
-    paymentMethod: 'Visa •••• 4242'
-  },
-  { 
-    id: 4, 
-    name: 'Amazon Prime', 
-    amount: 14.99, 
-    billingDate: 5, 
-    category: 'Shopping',
-    status: 'active',
-    nextBilling: '5 days',
-    color: '#FF9900',
-    frequency: 'monthly',
-    paymentMethod: 'Amex •••• 1234'
-  },
-  { 
-    id: 5, 
-    name: 'Apple iCloud', 
-    amount: 2.99, 
-    billingDate: 20, 
-    category: 'Storage',
-    status: 'active',
-    nextBilling: '20 days',
-    color: '#147CE5',
-    frequency: 'monthly',
-    paymentMethod: 'Apple Pay'
-  },
-  { 
-    id: 6, 
-    name: 'Disney+', 
-    amount: 10.99, 
-    billingDate: 8, 
-    category: 'Entertainment',
-    status: 'active',
-    nextBilling: '8 days',
-    color: '#113CCF',
-    frequency: 'monthly',
-    paymentMethod: 'Visa •••• 4242'
-  },
-  { 
-    id: 7, 
-    name: 'GitHub Pro', 
-    amount: 4.00, 
-    billingDate: 12, 
-    category: 'Productivity',
-    status: 'active',
-    nextBilling: '12 days',
-    color: '#171515',
-    frequency: 'monthly',
-    paymentMethod: 'Visa •••• 4242'
-  },
-  { 
-    id: 8, 
-    name: 'Notion', 
-    amount: 8.00, 
-    billingDate: 3, 
-    category: 'Productivity',
-    status: 'trial',
-    nextBilling: '3 days',
-    color: '#000000',
-    frequency: 'monthly',
-    paymentMethod: 'Trial'
-  },
-];
+import { deleteSubscription } from '@/client/supabaseServices';
+import { supabase } from '@/client/supabaseClient';
+import type { User } from '@supabase/supabase-js';
+import { supabaseContext } from '@/context/supabaseContext';
 
 export type Subscription = {
   id: number;
@@ -127,22 +31,30 @@ export type Subscription = {
   amount: number;
   category: string;
   color: string;
-  frequency: 'monthly' | 'yearly' | 'weekly' | string; // refine if needed
-  nextBilling: string; // or Date if you plan to parse it
+  frequency: 'monthly' | 'yearly' | 'weekly' | string; 
+  nextBilling: string; // or Date 
   paymentMethod: string;
-  status: 'active' | 'paused' | 'canceled' | string;   // refine if needed
+  status: 'active' | 'paused' | 'canceled' | string;
 };
 
-export const categories = ['all', 'Entertainment', 'Productivity', 'Storage', 'Shopping'];
+const categories = ['all', 'Entertainment', 'Productivity', 'Storage', 'Shopping'];
 
-export default function SubscriptionsPage({ onSelect }: {onSelect: (page: PageType) => void}) {
+export default function SubscriptionsPage({ onSelect }: { onSelect: (page: PageType) => void }) {
 
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(initialSubscriptions);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState('grid');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedSub, setSelectedSub] = useState(null);
+  const [selectedSub, setSelectedSub] = useState<Subscription | null>(null);
+  
+  const { subscriptions,setSubscriptions } = useContext(supabaseContext);
+  
+  // const [subscriptionsData, setSubscriptions] = useState<Subscription[]>([]);
+  
+  if(subscriptions == null) {
+    return <div></div>
+  }
+
 
 
   const filteredSubscriptions = subscriptions.filter(sub => {
@@ -154,10 +66,22 @@ export default function SubscriptionsPage({ onSelect }: {onSelect: (page: PageTy
   const totalMonthly = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
   const activeCount = subscriptions.filter(sub => sub.status === 'active').length;
 
-  const handleDelete = (id:number) => {
+  const handleDelete = async (id: number) => {
+    console.log("here");
     setSubscriptions(subscriptions.filter(sub => sub.id !== id));
+    
+    
+    console.log(selectedSub);
+    
+    
+    deleteSubscription(id)
+    
     setSelectedSub(null);
+
   };
+
+
+
 
   return (
     <div className="min-h-screen bg-linear-to-br rounded-2xl from-gray-900 via-black to-gray-900 p-6 lg:p-8">
@@ -170,7 +94,7 @@ export default function SubscriptionsPage({ onSelect }: {onSelect: (page: PageTy
           </div>
           <button
             // onClick={() => setShowAddModal(true)}
-            onClick={()=> handlePageChange('addSubs',onSelect,setIsMobileOpen=>{})}
+            onClick={() => handlePageChange('addSubs', onSelect, setIsMobileOpen => { })}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-semibold shadow-lg shadow-blue-500/20"
           >
             <Plus size={20} />
@@ -218,10 +142,10 @@ export default function SubscriptionsPage({ onSelect }: {onSelect: (page: PageTy
         </div>
 
         {/* Search and Filters */}
-        <SearchSubs searchTerm={searchTerm} setSearchTerm={setSearchTerm} categories={categories} setFilterCategory={setFilterCategory} filterCategory={filterCategory} />      
-  
+        <SearchSubs searchTerm={searchTerm} setSearchTerm={setSearchTerm} categories={categories} setFilterCategory={setFilterCategory} filterCategory={filterCategory} />
+
         {/* Subscriptions Grid */}
-        <SubsGrid filteredSubscriptions={filteredSubscriptions} onSelect={onSelect} handleDelete={handleDelete}/>
+        <SubsGrid filteredSubscriptions={filteredSubscriptions} onSelect={onSelect} handleDelete={()=>handleDelete(selectedSub!.id)} />
 
         {/* List View Alternative */}
         <div className="bg-gray-800/40 backdrop-blur-lg border border-gray-700 rounded-xl p-6">

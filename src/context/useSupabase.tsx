@@ -1,4 +1,6 @@
 import { useContext } from "react";
-import { SupabaseContext } from "./supabaseContext";
+import { supabaseContext } from "./supabaseContext";
 
-export const useSupabase = () => useContext(SupabaseContext);
+
+console.log("Context?")
+export const useSupabase = () => useContext(supabaseContext);

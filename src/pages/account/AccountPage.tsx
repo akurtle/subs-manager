@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { 
   User,
   Mail,
@@ -25,16 +25,18 @@ import BillingTab from './BillingTab';
 import PrefTab from './PrefTab';
 import { useSupabase } from '@/context/useSupabase';
 import { supabase } from '@/client/supabaseClient';
+import { supabaseContext } from '@/context/supabaseContext';
 
 
   type NotificationKey = 'email' | 'push' | 'renewals' | 'reports' | 'marketing';
   export type NotificationsType = Record<NotificationKey, boolean>;
 
-export default async  function AccountPage() {
+export default function AccountPage() {
 
   const db = supabase
 
-  const user = (await db.auth.getUser()).data;
+  const user = useContext(supabaseContext).user
+
 
   const [activeTab, setActiveTab] = useState('profile');
   const [showPassword, setShowPassword] = useState(false);
@@ -115,7 +117,7 @@ export default async  function AccountPage() {
         <div className="bg-gray-800/40 backdrop-blur-lg border border-gray-700 rounded-xl p-6 lg:p-8">
           {/* Profile Tab */}
           {activeTab === 'profile' && (
-            <ProfileTab user={user.user}/>
+            <ProfileTab user={user}/>
           )}
 
           {/* Security Tab */}

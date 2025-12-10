@@ -21,7 +21,7 @@ import type { PageType } from '../pageHandler';
 import type { Subscription } from './Subscription';
 
 
-import { addSubscription } from '@/client/supabaseFunc';
+import { addSubscription } from '@/client/supabaseServices';
 
 type errors={
 name:string,

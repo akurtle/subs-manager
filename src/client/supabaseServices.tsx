@@ -1,6 +1,7 @@
 import { useSupabase } from '@/context/useSupabase';
 import type {Subscription}  from '@/pages/subscriptions/Subscription';
 import { supabase } from './supabaseClient';
+import type { User } from '@supabase/supabase-js';
 
 
 export type SubscriptionFrequency =
@@ -17,7 +18,9 @@ export async function updateSubscription(
   id: string,
   updates: Partial<Subscription>
 ) {
+
   const { data: userData, error: userError } = await supabase.auth.getUser();
+
   if (userError || !userData.user) throw new Error("User not authenticated");
 
   const { data, error } = await supabase
@@ -33,7 +36,7 @@ export async function updateSubscription(
 }
 
 
-export async function deleteSubscription(id: string) {
+export async function deleteSubscription(id: number) {
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData.user) throw new Error("User not authenticated");
 
@@ -81,7 +84,7 @@ export async function addSubscription(params: Subscription) {
         throw new Error("User not authenticated");
     }
 
-    // Insert into DB
+    // inserts into the supabase db and returns errors as well if any 
     const { data, error } = await supabaseClient
         .from("subscriptions")
         .insert({
